@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: user_addresses
+      POSTGRES_USER: user_addresses
+      POSTGRES_PASSWORD: password
+    volumes:
+      - user-addresses-database:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - user-addresses-network
+
+  redis:
+    image: valkey/valkey:7-alpine
+    command: valkey-server --save 60 1 --loglevel warning
+    restart: unless-stopped
+    volumes:
+      - user-addresses-redis:/data
+    ports:
+      - '6379:6379'
+    networks:
+      - user-addresses-network
+
+volumes:
+  user-addresses-database:
+    name: user-addresses-database
+  user-addresses-redis:
+    name: user-addresses-redis
+
+networks:
+  user-addresses-network:
+    name: user-addresses-network
+    driver: bridge
